@@ -364,11 +364,40 @@ function addEntryFromInput() {
   return true;
 }
 
-function loadPreset(presetId) {
+/* --- Confirm modal -----------------------------------------------------
+   In-page replacement for window.confirm(): native dialogs are
+   auto-dismissed (answer: no) by some browsers and by automation, which
+   silently cancels the guarded action. This modal works everywhere. */
+let confirmOpen = false;
+function askConfirm(message, okLabel) {
+  if (confirmOpen) return Promise.resolve(false);
+  confirmOpen = true;
+  const modal = $("confirm-modal");
+  $("confirm-message").textContent = message;
+  $("confirm-ok-btn").textContent = okLabel || "Yes";
+  modal.hidden = false;
+  $("confirm-ok-btn").focus();
+  return new Promise((resolve) => {
+    const done = (answer) => {
+      modal.hidden = true;
+      confirmOpen = false;
+      document.removeEventListener("keydown", onKey, true);
+      resolve(answer);
+    };
+    const onKey = (e) => {
+      if (e.key === "Escape") { e.preventDefault(); done(false); }
+    };
+    document.addEventListener("keydown", onKey, true);
+    $("confirm-ok-btn").addEventListener("click", () => done(true), { once: true });
+    $("confirm-cancel-btn").addEventListener("click", () => done(false), { once: true });
+  });
+}
+
+async function loadPreset(presetId) {
   const preset = presetById(presetId);
   if (!preset) return false;
   if (entries.length > 0) {
-    const ok = window.confirm(`Replace your current entries with the "${preset.name}" starter list?`);
+    const ok = await askConfirm(`Replace your current entries with the "${preset.name}" starter list?`, "Yes, replace");
     if (!ok) return false;
   }
   entries = entriesFromPreset(presetId);
@@ -380,11 +409,11 @@ function loadPreset(presetId) {
   return true;
 }
 
-function loadNamedList(name) {
+async function loadNamedList(name) {
   const labels = lists[name];
   if (!labels) return false;
   if (entries.length > 0) {
-    const ok = window.confirm(`Replace your current entries with the saved list "${name}"?`);
+    const ok = await askConfirm(`Replace your current entries with the saved list "${name}"?`, "Yes, replace");
     if (!ok) return false;
   }
   entries = validateEntries(labels);
@@ -396,7 +425,7 @@ function loadNamedList(name) {
   return true;
 }
 
-function saveNamedList() {
+async function saveNamedList() {
   const input = $("save-list-name");
   const name = input.value.trim();
   if (!name) {
@@ -405,7 +434,7 @@ function saveNamedList() {
   }
   const existing = loadLists(safeStorage);
   if (Object.prototype.hasOwnProperty.call(existing, name)) {
-    const ok = window.confirm(`A list called "${name}" already exists. Overwrite it?`);
+    const ok = await askConfirm(`A list called "${name}" already exists. Overwrite it?`, "Yes, overwrite");
     if (!ok) return false;
   }
   const result = saveList(safeStorage, name, entries);
@@ -420,9 +449,9 @@ function saveNamedList() {
   return true;
 }
 
-function clearAll() {
+async function clearAll() {
   if (entries.length === 0) return false;
-  const ok = window.confirm("Remove every entry from the wheel?");
+  const ok = await askConfirm("Remove every entry from the wheel?", "Yes, clear all");
   if (!ok) return false;
   entries = [];
   pickedIds = [];

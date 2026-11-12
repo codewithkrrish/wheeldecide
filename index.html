@@ -126,6 +126,17 @@
     </div>
   </footer>
 
+  <div class="modal-backdrop" id="confirm-modal" hidden>
+    <div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title">
+      <h3 id="confirm-title">Are you sure?</h3>
+      <p id="confirm-message"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-small btn-ghost" id="confirm-cancel-btn">Cancel</button>
+        <button type="button" class="btn btn-small btn-danger" id="confirm-ok-btn">Yes</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="js/main.js"></script>
 </body>
 </html>

@@ -11,6 +11,11 @@
 
 * { box-sizing: border-box; }
 
+/* The UA's [hidden] rule (display:none) loses to any class that sets
+   display (e.g. .wheel-empty is flex), so re-assert it here — otherwise
+   "hidden" panels stay painted on screen. */
+[hidden] { display: none !important; }
+
 body {
   margin: 0;
   background: var(--bg);
@@ -340,4 +345,37 @@ input[type="text"]:focus {
   .history-panel, .about { grid-column: auto; }
   .site-header h1 { font-size: 2rem; }
   .winner-name { font-size: 1.5rem; }
+}
+
+/* Confirm modal (in-page, not window.confirm — native dialogs are
+   auto-dismissed by some browsers/automation, which silently kills
+   the guarded action). */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 50;
+}
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.55);
+}
+
+.modal h3 { margin: 0 0 8px; font-size: 1.15rem; }
+.modal p { color: var(--muted); margin: 0 0 20px; }
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
 }
