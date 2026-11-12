@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WheelDecide — Spin the Wheel to Decide</title>
+  <meta name="description" content="WheelDecide spins a wheel to settle the small decisions: what to eat, who goes first, movie night. Add your own entries, save lists, and spin — free, in your browser, nothing uploaded.">
+  <link rel="canonical" href="https://wheeldecide.vercel.app/">
+  <meta name="theme-color" content="#0B0B0F">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="WheelDecide — Spin the Wheel to Decide">
+  <meta property="og:description" content="Can't decide? Put it on the wheel. Custom entries, saved lists, and a fair spin — free, in your browser.">
+  <meta property="og:url" content="https://wheeldecide.vercel.app/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="WheelDecide — Spin the Wheel to Decide">
+  <meta name="twitter:description" content="Can't decide? Put it on the wheel. Custom entries, saved lists, and a fair spin — free, in your browser.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <h1>WheelDecide</h1>
+      <p class="tagline">Can't decide? Put it on the wheel. Add your options, spin, and let chance settle it — fairly.</p>
+    </div>
+  </header>
+
+  <main class="wrap layout">
+    <section class="panel wheel-panel" aria-label="The wheel">
+      <div class="wheel-wrap" id="wheel-wrap">
+        <canvas id="wheel-canvas" width="560" height="560" aria-label="Decision wheel" role="img"></canvas>
+        <canvas id="confetti-canvas" width="560" height="560" aria-hidden="true"></canvas>
+        <div class="pointer" aria-hidden="true"></div>
+        <div class="wheel-empty" id="wheel-empty" hidden>
+          <p class="empty-title">Your wheel is empty</p>
+          <p>Add at least two entries to spin — or load a starter list below.</p>
+        </div>
+      </div>
+
+      <p class="spin-status" id="spin-status" aria-live="polite">Add your options and spin the wheel.</p>
+
+      <div class="spin-actions">
+        <button type="button" class="btn btn-primary btn-spin" id="spin-btn">Spin the wheel</button>
+        <button type="button" class="btn" id="spin-again-btn" hidden>Spin again</button>
+      </div>
+
+      <div class="winner-banner" id="winner-banner" hidden>
+        <p class="winner-label">The wheel says</p>
+        <p class="winner-name" id="winner-name"></p>
+        <div class="winner-actions">
+          <button type="button" class="btn btn-small" id="winner-copy-btn">Copy result</button>
+          <button type="button" class="btn btn-small" id="winner-remove-btn">Remove from wheel</button>
+          <button type="button" class="btn btn-small btn-ghost" id="winner-dismiss-btn">Keep it</button>
+        </div>
+      </div>
+
+      <div class="options">
+        <label class="check">
+          <input type="checkbox" id="remove-winner-toggle">
+          <span>Remove the winner after each spin</span>
+        </label>
+        <label class="check">
+          <input type="checkbox" id="no-repeat-toggle">
+          <span>Don't repeat until everyone has been picked</span>
+        </label>
+        <p class="hint">With "don't repeat" on, the wheel skips entries that already won, until every entry has had a turn.</p>
+      </div>
+    </section>
+
+    <section class="panel entries-panel" aria-label="Entries and lists">
+      <h2>Your entries <span class="count" id="entry-count">0</span></h2>
+
+      <div class="add-row">
+        <input type="text" id="entry-input" placeholder="Add an option, e.g. Pizza" maxlength="60" autocomplete="off" aria-label="New entry">
+        <button type="button" class="btn btn-primary" id="add-entry-btn">Add</button>
+      </div>
+      <p class="status-message" id="status-message" role="status" aria-live="polite"></p>
+
+      <ul class="entries-list" id="entries-list"></ul>
+      <p class="empty-list" id="entries-empty">No entries yet. Add one above, or load a starter list.</p>
+
+      <div class="row-actions">
+        <button type="button" class="btn btn-small" id="shuffle-btn">Shuffle entries</button>
+        <button type="button" class="btn btn-small btn-danger" id="clear-all-btn">Clear all</button>
+      </div>
+
+      <h3>Starter lists</h3>
+      <div class="presets" id="preset-buttons">
+        <button type="button" class="btn btn-small preset-btn" data-preset="eat">What to eat?</button>
+        <button type="button" class="btn btn-small preset-btn" data-preset="movie">Movie night</button>
+        <button type="button" class="btn btn-small preset-btn" data-preset="first">Who goes first?</button>
+        <button type="button" class="btn btn-small preset-btn" data-preset="yesno">Yes or no?</button>
+      </div>
+      <p class="hint">Loading a starter list replaces your current entries.</p>
+
+      <h3>Saved lists</h3>
+      <div class="add-row">
+        <input type="text" id="save-list-name" placeholder="Name this list, e.g. Friday dinner" maxlength="40" autocomplete="off" aria-label="List name">
+        <button type="button" class="btn" id="save-list-btn">Save list</button>
+      </div>
+      <ul class="saved-lists" id="saved-lists"></ul>
+      <p class="empty-list" id="saved-lists-empty">No saved lists yet. Your lists live in this browser only.</p>
+    </section>
+
+    <section class="panel history-panel" aria-label="Spin history">
+      <div class="history-head">
+        <h2>Recent spins</h2>
+        <button type="button" class="btn btn-small btn-ghost" id="clear-history-btn">Clear history</button>
+      </div>
+      <ul class="history-list" id="history-list"></ul>
+      <p class="empty-list" id="history-empty">Nothing spun yet. Your last 10 winners show up here.</p>
+    </section>
+
+    <section class="panel about" aria-label="About this tool">
+      <h2>How it works</h2>
+      <p>Every entry gets an equal slice of the wheel, and the winner is picked with a uniform random draw — the spin animation is just theatre. The result is random, not rigged, and it is for fun decisions only: use it to pick dinner, not to settle anything that matters.</p>
+      <p>Everything runs in your browser. Your entries, saved lists and spin history are stored in this browser's local storage and never leave your device. Clearing your browser data clears them too.</p>
+      <p>Keyboard: press Enter to add an entry, and Space on the spin button to spin.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>Built by <a href="https://github.com/codewithkrrish/wheeldecide">krrish</a> · <a href="https://www.instagram.com/krrishx.ai">Instagram</a></p>
+      <p class="privacy">Everything runs in your browser — your lists never leave your device.</p>
+    </div>
+  </footer>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
