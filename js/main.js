@@ -90,16 +90,13 @@ function drawWheel() {
   ctx.clearRect(0, 0, size, size);
 
   if (entries.length === 0) {
+    // Empty circle only — the .wheel-empty overlay above the canvas
+    // carries the message, so drawing text here would double it.
     ctx.beginPath();
     ctx.arc(cx, cy, radius, 0, Math.PI * 2);
     ctx.strokeStyle = "#23232E";
     ctx.lineWidth = 2;
     ctx.stroke();
-    ctx.fillStyle = "#9A9AA5";
-    ctx.font = "600 22px Inter, system-ui, sans-serif";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("Add entries to build your wheel", cx, cy);
     return;
   }
 
