@@ -17,7 +17,7 @@ export const LISTS_KEY = "wheeldecide.lists.v1";
 export const HISTORY_KEY = "wheeldecide.history.v1";
 export const SETTINGS_KEY = "wheeldecide.settings.v1";
 
-export const SITE_URL = "https://wheeldecide.vercel.app/";
+export const SITE_URL = "https://wheeldecide-app.vercel.app/";
 
 /* Ten colours that stay readable on the dark wheel and differ clearly
  * from their neighbours. Entries cycle through them in order, so the
